@@ -16,7 +16,7 @@ def create_animation_window():
     return window
 
 
-def debugmode(window: Frame):
+def debug_mode(window: Frame):
     if Loop:
         window.mainloop()
 
@@ -31,8 +31,6 @@ class Pipe:
         children = window_p.winfo_children()
         if not children.__contains__(self._canvas):
             self._canvas.set_position(Point(0, 0), Size(Window_Width, Window_Height))
-
-
 
         self._created = False
 
@@ -103,10 +101,10 @@ class Node:
         )
         self.information = info
         self._label = self._canvas.create_text((Node_Width / 2, Node_Height / 2),
-                                              anchor="center",
-                                              text=self.information.ID,
-                                              font="Times 20",
-                                              fill="darkblue")
+                                               anchor="center",
+                                               text=self.information.ID,
+                                               font="Times 20",
+                                               fill="darkblue")
 
         self.left_side = Point(position.x, position.y + size.height / 2 - Bufferzone_Height / 2)
         self.right_side = Point(position.x + size.width, position.y + size.height / 2 - Bufferzone_Height / 2)
@@ -117,8 +115,12 @@ class Node:
         self._canvas.place(x=position.x, y=position.y)
 
     def connect_to(self, other_node):
-        pipe = Pipe(self._window, )
-        pass
+        source_importance = Importance(self, 1, 1, 0)
+        stock_importance = Importance(other_node, 1, 1, 0)
+        new_pipe = Pipe(self._window, source_importance, stock_importance)
+
+        self.add_pipe(new_pipe)
+        other_node.add_pipe(new_pipe)
 
     def add_pipe(self, pipe: Pipe):
         self._pipes.append(pipe)
@@ -149,17 +151,8 @@ node_source = Node(window_p, Point(50, 50), Size(Node_Width, Node_Height), NodeI
 node_stock = Node(window_p, Point(400, 90), Size(Node_Width, Node_Height), NodeInformation('', 1))
 node_seva = Node(window_p, Point(779, 1), Size(Node_Width, Node_Height), NodeInformation('', 2))
 
-i_sc = Importance(node_source, 1, 1, 0)
-i_st = Importance(node_stock, 1, 1, 0)
-i_sv = Importance(node_seva, 1, 1, 0)
-pipe = Pipe(window_p, i_sc, i_st)
-other_pipe = Pipe(window_p, i_sc, i_sv)
+node_source.connect_to(node_stock)
+node_source.connect_to(node_seva)
+node_seva.connect_to(node_stock)
 
-node_source.add_pipe(pipe)
-node_source.add_pipe(other_pipe)
-
-node_stock.add_pipe(pipe)
-node_seva.add_pipe(other_pipe)
-# move_style(window, node)
-
-debugmode(window_p)
+debug_mode(window_p)
